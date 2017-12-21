@@ -1,0 +1,23 @@
+#!/usr/bin/expect -f
+set MyPort 22
+set MyIpList ./ip.txt
+set MyPasswd #填入密码
+set MyCmd "echo test"
+
+#结果log
+log_file ./exp.log
+
+#root身份判断用操作符#判断
+set f [ open ${MyIpList} r ]
+while { [gets $f line ]>=0 } {
+set ip $line
+spawn ssh root@${line} -p $MyPort
+expect {
+"yes/no" { send "yes\r";exp_continue }
+"password:" { send "${MyPasswd}\r"}
+}
+expect "#"
+send "${MyCmd} \r"
+send "exit\r"
+interact
+}
